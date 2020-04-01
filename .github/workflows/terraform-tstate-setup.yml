@@ -1,0 +1,100 @@
+name: Setup Terraform Backend State Storage and Initialize main resource group
+
+on:
+  [push]
+
+env:
+  SHORT_NAME: githubactions  
+  LOCATION: 'eastus2'
+jobs:
+ 
+  Main-Terraform:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Azure Terraform Setup
+      id: tfsetup
+      uses: fluffy-bunny/action-docker-azure-terraform-setup@v0.1-alpha
+      with:
+        shortName: ${{ env.SHORT_NAME }}
+        location: ${{ env.LOCATION }}
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
+    - name: Get the output tfsetup
+      shell: bash
+      run: |
+        echo "The storage_account_name was:   '${{ steps.tfsetup.outputs.storage_account_name }}'"
+        echo "The container_name was:         '${{ steps.tfsetup.outputs.container_name }}'"
+        echo "The secret_name was:            '${{ steps.tfsetup.outputs.secret_name }}'"
+        echo "The keyvault_name was:          '${{ steps.tfsetup.outputs.keyvault_name }}'"
+
+
+    - name: 'az login'
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
+    - name: 'Checkout GitHub Action'
+      uses: actions/checkout@master
+    
+    - name: 'Install Terraform'
+      shell: bash
+      run: |
+        pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+        sudo apt-get install wget unzip
+        if [ -f "terraform" ] 
+        then
+          echo "File terraform exists." 
+          rm terraform
+        fi
+        wget https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip
+        unzip terraform_0.12.24_linux_amd64.zip 
+        sudo cp terraform /usr/local/bin
+        sudo chmod +x /usr/local/bin
+        terraform --version 
+        popd
+        
+    - name: 'Terraform Init'
+      shell: bash
+      run: |
+        pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+        echo 'export ARM_ACCESS_KEY=$(az keyvault secret show --name ${{ steps.tfsetup.outputs.secret_name }} --vault-name ${{ steps.tfsetup.outputs.keyvault_name }} --query value -o tsv)'
+        export ARM_ACCESS_KEY=$(az keyvault secret show --name ${{ steps.tfsetup.outputs.secret_name }} --vault-name ${{ steps.tfsetup.outputs.keyvault_name }} --query value -o tsv)
+        export ARM_CLIENT_ID='${{secrets.ARM_CLIENT_ID}}'
+        export ARM_CLIENT_SECRET='${{secrets.ARM_CLIENT_SECRET}}'
+        export ARM_SUBSCRIPTION_ID=$(az account show --query id | xargs)
+        export ARM_TENANT_ID=$(az account show --query tenantId | xargs)
+
+        ls
+        cd src/
+        terraform init 
+        popd
+
+    - name: 'Terraform Plan'
+      shell: bash
+      run: |
+        pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+        export ARM_ACCESS_KEY=$(az keyvault secret show --name ${{ steps.tfsetup.outputs.secret_name }} --vault-name ${{ steps.tfsetup.outputs.keyvault_name }} --query value -o tsv)
+        export ARM_CLIENT_ID='${{secrets.ARM_CLIENT_ID}}'
+        export ARM_CLIENT_SECRET='${{secrets.ARM_CLIENT_SECRET}}'
+        export ARM_SUBSCRIPTION_ID=$(az account show --query id | xargs)
+        export ARM_TENANT_ID=$(az account show --query tenantId | xargs)
+
+        ls
+        cd src/
+        terraform plan -out=tf.plan
+        popd
+  
+    - name: 'Terraform Apply'
+      shell: bash
+      run: |
+        pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+        export ARM_ACCESS_KEY=$(az keyvault secret show --name ${{ steps.tfsetup.outputs.secret_name }} --vault-name ${{ steps.tfsetup.outputs.keyvault_name }} --query value -o tsv)
+        export ARM_CLIENT_ID='${{secrets.ARM_CLIENT_ID}}'
+        export ARM_CLIENT_SECRET='${{secrets.ARM_CLIENT_SECRET}}'
+        export ARM_SUBSCRIPTION_ID=$(az account show --query id | xargs)
+        export ARM_TENANT_ID=$(az account show --query tenantId | xargs)
+
+        ls
+        cd src/
+        terraform apply tf.plan
+        popd 
