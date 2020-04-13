@@ -4,7 +4,7 @@ terraform {
     # Do not declare an access_key here. Instead, export the
     # ARM_ACCESS_KEY environment variable.
 
-    storage_account_name  = "stterraformgithubactions"
+    storage_account_name  = "stterraformshorturl2"
     container_name        = "tstate"
     key                   = "terraform.tfstate"
   }

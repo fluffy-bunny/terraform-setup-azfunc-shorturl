@@ -1,0 +1,6 @@
+-P ubuntu-latest=nektos/act-environments-ubuntu:18.04
+-s AZURE_CREDENTIALS
+-s ARM_CLIENT_ID
+-s ARM_CLIENT_SECRET
+-s ARM_SUBSCRIPTION_ID
+-s ARM_TENANT_ID

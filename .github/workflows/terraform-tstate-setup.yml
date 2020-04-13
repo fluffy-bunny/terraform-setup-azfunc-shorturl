@@ -4,7 +4,7 @@ on:
   [push]
 
 env:
-  SHORT_NAME: githubactions  
+  SHORT_NAME: shorturl2  
   LOCATION: 'eastus2'
 jobs:
  
@@ -66,7 +66,7 @@ jobs:
 
         ls
         cd src/
-        terraform init 
+        terraform init -reconfigure
         popd
 
     - name: 'Terraform Plan'
