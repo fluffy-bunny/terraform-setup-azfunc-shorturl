@@ -96,4 +96,3 @@ since I do an Azure Login, I just pull some of the ID's based on the current log
 [terraform service_principal_client_secret](https://www.terraform.io/docs/providers/azurerm/guides/service_principal_client_secret.html)  
 [github action azure login](https://github.com/Azure/login)  
 
-
