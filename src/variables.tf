@@ -26,6 +26,30 @@ variable "func_name" {
   type        = string
 }
 
+variable "keyvault_name" {
+  description = "(Required) The main keyvault."
+  type        = string
+}
+
+variable "cosmos_name" {
+  description = "(Required) The main cosmos_name."
+  type        = string
+}
+
+variable "cosmosConfigTemplateEmulator" {
+  description = "(Required) The main cosmosConfigTemplateEmulator.  BASE64 encoded JSON "
+  type        = string
+}
+variable "cosmosConfigTemplateProduction" {
+  description = "(Required) The main cosmosConfcosmosConfigTemplateProductionigTemplate.  BASE64 encoded JSON "
+  type        = string
+}
+
+
+variable "cosmosPrimaryKeyEmulator" {
+  description = "(Required) The main cosmosPrimaryKeyEmulator.  "
+  type        = string
+}
 
 variable "tags" {
   description = "Tags to help identify various services."
