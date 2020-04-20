@@ -41,7 +41,7 @@ variable "cosmosConfigTemplateEmulator" {
   type        = string
 }
 variable "cosmosConfigTemplateProduction" {
-  description = "(Required) The main cosmosConfcosmosConfigTemplateProductionigTemplate.  BASE64 encoded JSON "
+  description = "(Required) The main cosmosConfigTemplateProduction.  BASE64 encoded JSON "
   type        = string
 }
 
@@ -50,11 +50,25 @@ variable "cosmosPrimaryKeyEmulator" {
   description = "(Required) The main cosmosPrimaryKeyEmulator.  "
   type        = string
 }
+variable "azFuncShorturlClientCredentials" {
+  description = "(Required) The main azFuncShorturlClientCredentials.  BASE64 encoded JSON "
+  type        = string
+}
+
+variable "jwtValidateSettings" {
+  description = "(Required) The main jwtValidateSettings.  BASE64 encoded JSON "
+  type        = string
+}
+
+
+
+
 
 variable "tags" {
   description = "Tags to help identify various services."
   type        = map
   default = {
+    Org            = "ssa"
     DeployedBy     = "terraform"
     Environment    = "prod"
     OwnerEmail     = "DL-P7-OPS@p7.com"

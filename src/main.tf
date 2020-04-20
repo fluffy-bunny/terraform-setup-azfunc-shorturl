@@ -19,6 +19,7 @@ provider "azurerm" {
 resource "azurerm_resource_group" "rg" {
   name     = var.resource_group_name
   location = var.location_name
+  tags = var.tags
 }
 
 data "azurerm_client_config" "current" {}
@@ -33,6 +34,7 @@ resource "azurerm_storage_account" "main" {
   location                 = azurerm_resource_group.rg.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
+  tags = var.tags
 }
 
 resource "azurerm_app_service_plan" "main" {
@@ -45,12 +47,14 @@ resource "azurerm_app_service_plan" "main" {
     tier = "Dynamic"
     size = "Y1"
   }
+  tags = var.tags
 }
 resource "azurerm_application_insights" "main" {
   name                = var.app_insights_name
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   application_type    = "web"
+  tags = var.tags
 }
 
 resource "azurerm_function_app" "main" {
@@ -68,6 +72,7 @@ resource "azurerm_function_app" "main" {
     "FUNCTIONS_WORKER_RUNTIME"                          = "dotnet"
   }
   version="~3"
+  tags = var.tags
 
 }
 
@@ -145,6 +150,7 @@ resource "azurerm_key_vault" "main" {
   purge_protection_enabled    = false
 
   sku_name = "standard"
+  tags = var.tags
 
    
 }
@@ -167,6 +173,7 @@ resource "azurerm_cosmosdb_account" "db" {
     location          = azurerm_resource_group.rg.location
     failover_priority = 0
   }
+  tags = var.tags
 }
 resource "azurerm_cosmosdb_sql_database" "sql_database" {
   name                = "db-shortUrl"
@@ -174,6 +181,7 @@ resource "azurerm_cosmosdb_sql_database" "sql_database" {
   account_name        = var.cosmos_name
   throughput          = 400
 }
+
 resource "azurerm_cosmosdb_sql_container" "container_operational" {
   name                = "operational"
   resource_group_name = azurerm_cosmosdb_account.db.resource_group_name
@@ -183,6 +191,7 @@ resource "azurerm_cosmosdb_sql_container" "container_operational" {
   throughput          = 400
 
   default_ttl         = -1
+
 }
 resource "azurerm_key_vault_secret" "cosmosPrimaryKeyProduction" {
   name         = "cosmosPrimaryKeyProduction"
@@ -223,3 +232,25 @@ resource "azurerm_key_vault_secret" "cosmosConfigTemplateProduction" {
     environment = "Production"
   }
 } 
+
+resource "azurerm_key_vault_secret" "azFuncShorturlClientCredentials" {
+  name         = "azFuncShorturlClientCredentials"
+  value        = var.azFuncShorturlClientCredentials
+  key_vault_id = azurerm_key_vault.main.id
+
+  tags = {
+    environment = "Production"
+  }
+} 
+
+resource "azurerm_key_vault_secret" "jwtValidateSettings" {
+  name         = "jwtValidateSettings"
+  value        = var.jwtValidateSettings
+  key_vault_id = azurerm_key_vault.main.id
+
+  tags = {
+    environment = "Production"
+  }
+} 
+
+
