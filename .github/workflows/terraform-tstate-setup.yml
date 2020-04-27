@@ -6,6 +6,8 @@ on:
 env:
   SHORT_NAME: shorturl2  
   LOCATION: 'eastus2'
+  TAGS: 'Org=ssa DeployedBy=terraform Environment=prod OwnerEmail=DL-P7-OPS@p7.com Platform=na'           
+
 jobs:
  
   Main-Terraform:
@@ -13,12 +15,13 @@ jobs:
     steps:
     - name: Azure Terraform Setup
       id: tfsetup
-      uses: fluffy-bunny/action-docker-azure-terraform-setup@v0.1-alpha
+      uses: fluffy-bunny/action-docker-azure-terraform-setup@v0.3-alpha
       with:
         shortName: ${{ env.SHORT_NAME }}
         location: ${{ env.LOCATION }}
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-        
+        tags: ${{ env.TAGS }}
+
     - name: Get the output tfsetup
       shell: bash
       run: |
