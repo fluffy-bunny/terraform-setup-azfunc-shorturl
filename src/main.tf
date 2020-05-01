@@ -37,6 +37,12 @@ resource "azurerm_storage_account" "main" {
   tags = var.tags
 }
 
+resource "azurerm_storage_container" "eventdump" {
+  name                  = "ehub-dump"
+  storage_account_name  = azurerm_storage_account.main.name
+  container_access_type = "private"
+}
+
 resource "azurerm_app_service_plan" "main" {
   name                = var.plan_name
   location            = azurerm_resource_group.rg.location
@@ -253,4 +259,32 @@ resource "azurerm_key_vault_secret" "jwtValidateSettings" {
   }
 } 
 
+resource "azurerm_eventhub_namespace" "main" {
+  name                = var.event_hub_namespace
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  sku                 = "Standard"
+  capacity            = 1
 
+  tags = {
+    environment = "Production"
+  }
+}
+
+resource "azurerm_eventhub" "example" {
+  name                = var.event_hub_name
+  namespace_name      = azurerm_eventhub_namespace.main.name
+  resource_group_name = azurerm_resource_group.rg.name
+  partition_count     = 2
+  message_retention   = 1
+  capture_description {
+    enabled  = true
+    encoding = "Avro"
+    destination {
+      name                = "EventHubArchive.AzureBlockBlob"
+      archive_name_format = "{Namespace}/{EventHub}/{PartitionId}/{Year}/{Month}/{Day}/{Hour}/{Minute}/{Second}"
+      blob_container_name = azurerm_storage_container.eventdump.name
+      storage_account_id  = azurerm_storage_account.main.id
+    }
+  }
+}

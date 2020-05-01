@@ -60,8 +60,14 @@ variable "jwtValidateSettings" {
   type        = string
 }
 
-
-
+variable "event_hub_namespace" {
+  description = "(Required) event_hub_namespace"
+  type        = string
+}
+variable "event_hub_name" {
+  description = "(Required) event_hub_name"
+  type        = string
+}
 
 
 variable "tags" {
