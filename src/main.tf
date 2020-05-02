@@ -271,7 +271,7 @@ resource "azurerm_eventhub_namespace" "main" {
   }
 }
 
-resource "azurerm_eventhub" "example" {
+resource "azurerm_eventhub" "main" {
   name                = var.event_hub_name
   namespace_name      = azurerm_eventhub_namespace.main.name
   resource_group_name = azurerm_resource_group.rg.name
@@ -287,4 +287,22 @@ resource "azurerm_eventhub" "example" {
       storage_account_id  = azurerm_storage_account.main.id
     }
   }
+}
+resource "azurerm_eventhub_authorization_rule" "listener" {
+  name                = format("sas-listener-%s",var.event_hub_name)
+  namespace_name      = azurerm_eventhub_namespace.main.name
+  eventhub_name       = azurerm_eventhub.main.name
+  resource_group_name = azurerm_resource_group.rg.name
+  listen              = true
+  send                = false
+  manage              = false
+}
+resource "azurerm_eventhub_authorization_rule" "sender" {
+  name                = format("sas-sender-%s",var.event_hub_name)
+  namespace_name      = azurerm_eventhub_namespace.main.name
+  eventhub_name       = azurerm_eventhub.main.name
+  resource_group_name = azurerm_resource_group.rg.name
+  listen              = false
+  send                = true
+  manage              = false
 }
