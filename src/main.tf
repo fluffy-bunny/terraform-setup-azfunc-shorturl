@@ -297,6 +297,36 @@ resource "azurerm_eventhub_authorization_rule" "listener" {
   send                = false
   manage              = false
 }
+resource "azurerm_key_vault_secret" "azurerm_eventhub_authorization_rule_listener" {
+  name         = format("sas-listener-%s-primary-connection-string",var.event_hub_name)
+  value        = azurerm_eventhub_authorization_rule.listener.primary_connection_string 
+  key_vault_id = azurerm_key_vault.main.id
+
+  tags = {
+    environment = "Dev"
+  }
+} 
+resource "azurerm_key_vault_secret" "azurerm_eventhub_authorization_rule_listener_primary_connection_string" {
+  name         = format("sas-listener-%s-primary-connection-string",var.event_hub_name)
+  value        = azurerm_eventhub_authorization_rule.listener.primary_connection_string 
+  key_vault_id = azurerm_key_vault.main.id
+
+  tags = {
+    environment = "Dev"
+  }
+} 
+
+resource "azurerm_key_vault_secret" "azurerm_eventhub_authorization_rule_listener_primary_key" {
+  name         = format("sas-listener-%s-primary-key",var.event_hub_name)
+  value        = azurerm_eventhub_authorization_rule.listener.primary_key 
+  key_vault_id = azurerm_key_vault.main.id
+
+  tags = {
+    environment = "Dev"
+  }
+} 
+
+
 resource "azurerm_eventhub_authorization_rule" "sender" {
   name                = format("sas-sender-%s",var.event_hub_name)
   namespace_name      = azurerm_eventhub_namespace.main.name
@@ -306,3 +336,23 @@ resource "azurerm_eventhub_authorization_rule" "sender" {
   send                = true
   manage              = false
 }
+
+resource "azurerm_key_vault_secret" "azurerm_eventhub_authorization_rule_sender_primary_connection_string" {
+  name         = format("sas-sender-%s-primary-connection-string",var.event_hub_name)
+  value        = azurerm_eventhub_authorization_rule.sender.primary_connection_string 
+  key_vault_id = azurerm_key_vault.main.id
+
+  tags = {
+    environment = "Dev"
+  }
+} 
+
+resource "azurerm_key_vault_secret" "azurerm_eventhub_authorization_rule_sender_primary_key" {
+  name         = format("sas-sender-%s-primary-key",var.event_hub_name)
+  value        = azurerm_eventhub_authorization_rule.sender.primary_key 
+  key_vault_id = azurerm_key_vault.main.id
+
+  tags = {
+    environment = "Dev"
+  }
+} 
