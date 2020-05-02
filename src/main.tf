@@ -102,7 +102,11 @@ resource "azurerm_function_app" "main" {
   tags = var.tags
 
 }
-
+resource "azurerm_role_assignment" "sbdo_ste_azfunc" {
+  scope                = azurerm_storage_account.main.id
+  role_definition_name = "Storage Blob Data Owner"
+  principal_id         = azurerm_function_app.main.identity.0.principal_id
+}
 resource "azurerm_key_vault_access_policy" "appAccess" {
 
   key_vault_id                = azurerm_key_vault.main.id
