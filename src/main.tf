@@ -27,6 +27,10 @@ data "azurerm_subscription" "primary" {}
 data "azurerm_role_definition" "contributor" {
   name = "Contributor"
 }
+data "azurerm_role_definition" "Storage_Blob_Data_Owner" {
+  name = "Storage Blob Data Owner"
+}
+ 
 
 resource "azurerm_storage_account" "main" {
   name                     = var.storage_account_name
@@ -43,6 +47,23 @@ resource "azurerm_storage_container" "eventdump" {
   container_access_type = "private"
 }
 
+resource "azurerm_storage_container" "checkpoint" {
+  name                  = "ehub-checkpoint"
+  storage_account_name  = azurerm_storage_account.main.name
+  container_access_type = "private"
+}
+
+resource "azurerm_role_assignment" "blob_owner_to_principal" {
+  scope                = data.azurerm_subscription.primary.id
+  role_definition_name = "Storage Blob Data Owner"
+  principal_id         = data.azurerm_client_config.current.object_id
+}
+
+resource "azurerm_role_assignment" "sbdo_ste_principal" {
+  scope                = azurerm_storage_account.main.id
+  role_definition_name = "Storage Blob Data Owner"
+  principal_id         = data.azurerm_client_config.current.object_id
+}
 resource "azurerm_app_service_plan" "main" {
   name                = var.plan_name
   location            = azurerm_resource_group.rg.location
