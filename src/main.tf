@@ -266,9 +266,7 @@ resource "azurerm_eventhub_namespace" "main" {
   sku                 = "Standard"
   capacity            = 1
 
-  tags = {
-    environment = "Production"
-  }
+  tags = var.tags
 }
 
 resource "azurerm_eventhub" "main" {
