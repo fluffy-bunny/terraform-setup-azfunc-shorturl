@@ -224,6 +224,17 @@ resource "azurerm_cosmosdb_sql_container" "container_operational" {
   default_ttl         = -1
 
 }
+
+resource "azurerm_key_vault_secret" "main_ste_primary_key" {
+  name         = format("%s-primary-connection-string",azurerm_storage_account.main.name)
+  value        = azurerm_storage_account.main.primary_connection_string
+  key_vault_id = azurerm_key_vault.main.id
+
+  tags = {
+    environment = "Dev"
+  }
+} 
+
 resource "azurerm_key_vault_secret" "cosmosPrimaryKeyProduction" {
   name         = "cosmosPrimaryKeyProduction"
   value        = azurerm_cosmosdb_account.db.primary_master_key
