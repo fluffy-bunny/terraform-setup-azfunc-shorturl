@@ -84,6 +84,17 @@ resource "azurerm_application_insights" "main" {
   tags = var.tags
 }
 
+resource "azurerm_key_vault_secret" "appis_instrumentation_key" {
+  name         = format("%s-instrumentation-key",azurerm_application_insights.main.name)
+  value        = azurerm_application_insights.main.instrumentation_key
+  key_vault_id = azurerm_key_vault.main.id
+
+  tags = {
+    environment = "Dev"
+  }
+} 
+
+
 resource "azurerm_function_app" "main" {
   name                      = var.func_name
   location                  = azurerm_resource_group.rg.location
